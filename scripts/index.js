@@ -9,7 +9,6 @@ function createCard(cardTemplate, element) {
     .cloneNode(true);
 
   cardElement.querySelector(".card__image").setAttribute("src", element.link);
-  cardElement.querySelector(".card__image").setAttribute("alt", element.name);
   cardElement.querySelector(".card__title").textContent = element.name;
 
   const deleteButton = cardElement.querySelector(".card__delete-button");
