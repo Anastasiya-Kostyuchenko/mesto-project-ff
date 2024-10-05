@@ -13,6 +13,7 @@ module.exports = {
     publicPath: "",
   },
   mode: "development",
+  devtool: "source-map",
   devServer: {
     static: path.resolve(__dirname, "./dist"),
     open: true,
@@ -28,6 +29,10 @@ module.exports = {
       },
       {
         test: /\.(png|svg|jpg|gif|woff(2)?|eot|ttf|otf)$/,
+        type: "asset/resource",
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
         type: "asset/resource",
       },
       {
