@@ -1,5 +1,5 @@
 export { createCard, delCard };
-import { openPopup } from "./modal";
+import { openImagePopup } from "../index";
 
 // Функция создания карточки
 function createCard(template, element) {
@@ -18,10 +18,6 @@ function createCard(template, element) {
 
   likeButton.addEventListener("click", function () {
     likeButton.classList.toggle("card__like-button_is-active");
-
-    cardImage.addEventListener("click", () => {
-      openCardImage(element.link, element.name);
-    });
   });
 
   cardImage.addEventListener("click", () => {
@@ -34,16 +30,4 @@ function createCard(template, element) {
 // Функция удаления карточки
 function delCard(cardElement) {
   cardElement.remove();
-}
-
-// Экспортируем функцию для открытия изображения
-export function openImagePopup(link, name) {
-  const imagePopup = document.querySelector(".popup_type_image");
-  const imageElement = imagePopup.querySelector(".popup__image");
-  const captionElement = imagePopup.querySelector(".popup__caption");
-  imageElement.src = link;
-  imageElement.alt = name;
-  captionElement.textContent = name;
-
-  openPopup(imagePopup);
 }

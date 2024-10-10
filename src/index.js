@@ -1,10 +1,11 @@
 import "./index.css";
-import { createCard, delCard, openImagePopup } from "./components/card.js";
+import { createCard, delCard } from "./components/card.js";
 import {
   openPopup,
   closePopup,
   handleEscClose,
   getOpenedPopup,
+  setPopupListeners,
 } from "./components/modal.js";
 import { initialCards } from "./cards";
 
@@ -15,7 +16,7 @@ const editPopup = document.querySelector(".popup_type_edit");
 const addCardPopup = document.querySelector(".popup_type_new-card");
 const editButton = document.querySelector(".profile__edit-button");
 const addButton = document.querySelector(".profile__add-button");
-const formElement = document.querySelector(".popup__form");
+const popupForm = document.querySelector(".popup__form");
 const nameInput = document.querySelector(".popup__input_type_name");
 const jobInput = document.querySelector(".popup__input_type_description");
 const profileName = document.querySelector(".profile__title");
@@ -23,12 +24,17 @@ const profileJob = document.querySelector(".profile__description");
 const cardNameInput = document.querySelector(".popup__input_type_card-name");
 const cardUrlInput = document.querySelector(".popup__input_type_url");
 const cardForm = document.querySelector('form[name="new-place"]');
+const imagePopup = document.querySelector(".popup_type_image");
+const imageElement = imagePopup.querySelector(".popup__image");
+const captionElement = imagePopup.querySelector(".popup__caption");
 
 // Добавляем карточки на страницу при загрузке
 initialCards.forEach((element) => {
   const cardElement = createCard(cardTemplate, element);
   placesList.append(cardElement);
 });
+
+setPopupListeners();
 
 // Обработчик открытия и закрытия попапа редактирования профиля
 editButton.addEventListener("click", () => {
@@ -38,7 +44,7 @@ editButton.addEventListener("click", () => {
 });
 
 // Обработчик сохранения данных профиля
-function handleFormSubmit(evt) {
+function profileSaveButton(evt) {
   evt.preventDefault();
   profileName.textContent = nameInput.value;
   profileJob.textContent = jobInput.value;
@@ -46,7 +52,7 @@ function handleFormSubmit(evt) {
 }
 
 // Слушатель отправки формы редактирования профиля
-formElement.addEventListener("submit", handleFormSubmit);
+popupForm.addEventListener("submit", profileSaveButton);
 
 // Обработчик открытия попапа добавления карточки
 addButton.addEventListener("click", () => {
@@ -71,3 +77,12 @@ closeButtons.forEach((button) => {
   const popup = button.closest(".popup");
   button.addEventListener("click", () => closePopup(popup));
 });
+
+// Экспортируем функцию для открытия изображения
+export function openImagePopup(link, name) {
+  imageElement.src = link;
+  imageElement.alt = name;
+  captionElement.textContent = name;
+
+  openPopup(imagePopup);
+}

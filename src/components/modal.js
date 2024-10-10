@@ -1,33 +1,22 @@
-let openedPopup = null;
+let openedPopup = null; // Переменная для хранения открытого попапа
 
 // Универсальная функция открытия попапов
 export function openPopup(popup) {
-  popup.style.display = "flex";
-  popup.style.opacity = "0";
-  popup.style.visibility = "visible";
-  requestAnimationFrame(() => {
-    popup.style.transition = "opacity 0.6s";
-    popup.style.opacity = "1";
-  });
-
+  popup.classList.add("popup_is-visible");
+  popup.classList.add("popup_is-opened");
   openedPopup = popup;
   document.addEventListener("keydown", handleEscClose);
 }
 
 // Универсальная функция закрытия попапов
 export function closePopup(popup) {
-  popup.style.transition = "opacity 0.6s";
-  popup.style.opacity = "0";
-
+  popup.classList.remove("popup_is-opened");
   popup.addEventListener("transitionend", function handleTransitionEnd() {
-    popup.style.display = "none";
-    popup.style.visibility = "hidden";
+    popup.classList.remove("popup_is-visible");
     popup.removeEventListener("transitionend", handleTransitionEnd);
-    if (openedPopup === popup) {
-      openedPopup = null;
-    }
   });
 
+  openedPopup = null;
   document.removeEventListener("keydown", handleEscClose);
 }
 
@@ -40,15 +29,17 @@ export function handleEscClose(evt) {
   }
 }
 
-// Закрытие попапа по клику на оверлей
-const popups = document.querySelectorAll(".popup");
-popups.forEach((popup) => {
-  popup.addEventListener("click", (evt) => {
-    if (
-      evt.target === evt.currentTarget ||
-      evt.target.classList.contains("popup__close")
-    ) {
-      closePopup(popup);
-    }
+export function setPopupListeners() {
+  // Закрытие попапа по клику на оверлей
+  const popups = document.querySelectorAll(".popup");
+  popups.forEach((popup) => {
+    popup.addEventListener("click", (evt) => {
+      if (
+        evt.target === evt.currentTarget ||
+        evt.target.classList.contains("popup__close")
+      ) {
+        closePopup(popup);
+      }
+    });
   });
-});
+}
