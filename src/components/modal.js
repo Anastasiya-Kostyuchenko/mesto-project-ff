@@ -2,19 +2,20 @@ let openedPopup = null; // Переменная для хранения откр
 
 // Универсальная функция открытия попапов
 export function openPopup(popup) {
-  popup.classList.add("popup_is-visible");
   popup.classList.add("popup_is-opened");
   openedPopup = popup;
   document.addEventListener("keydown", handleEscClose);
 }
 
 // Универсальная функция закрытия попапов
+
 export function closePopup(popup) {
   popup.classList.remove("popup_is-opened");
-  popup.addEventListener("transitionend", function handleTransitionEnd() {
-    popup.classList.remove("popup_is-visible");
+  function handleTransitionEnd() {
+    popup.classList.remove("popup_is-opened");
     popup.removeEventListener("transitionend", handleTransitionEnd);
-  });
+  }
+  popup.addEventListener("transitionend", handleTransitionEnd);
 
   openedPopup = null;
   document.removeEventListener("keydown", handleEscClose);
@@ -42,4 +43,19 @@ export function setPopupListeners() {
       }
     });
   });
+}
+
+// Экспортируем функцию для открытия изображения
+export function openImagePopup(
+  link,
+  name,
+  imageElement,
+  captionElement,
+  imagePopup
+) {
+  imageElement.src = link;
+  imageElement.alt = name;
+  captionElement.textContent = name;
+
+  openPopup(imagePopup);
 }

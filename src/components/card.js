@@ -1,8 +1,7 @@
 export { createCard, delCard };
-import { openImagePopup } from "../index";
 
 // Функция создания карточки
-function createCard(template, element) {
+function createCard(template, element, openImagePopup) {
   const cardElement = template.content
     .querySelector(".places__item")
     .cloneNode(true);
