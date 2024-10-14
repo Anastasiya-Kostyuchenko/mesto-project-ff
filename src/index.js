@@ -1,7 +1,6 @@
 import "./index.css";
 import { createCard, delCard } from "./components/card.js";
 import {
-  openImagePopup,
   openPopup,
   closePopup,
   handleEscClose,
@@ -17,7 +16,7 @@ const editPopup = document.querySelector(".popup_type_edit");
 const addCardPopup = document.querySelector(".popup_type_new-card");
 const editButton = document.querySelector(".profile__edit-button");
 const addButton = document.querySelector(".profile__add-button");
-const profileForm = document.querySelector(".popup__form");
+const formSelector = document.querySelector(".popup__form");
 const nameInput = document.querySelector(".popup__input_type_name");
 const jobInput = document.querySelector(".popup__input_type_description");
 const profileName = document.querySelector(".profile__title");
@@ -56,7 +55,7 @@ function profileSaveButton(evt) {
 }
 
 // Слушатель отправки формы редактирования профиля
-profileForm.addEventListener("submit", profileSaveButton);
+formSelector.addEventListener("submit", profileSaveButton);
 
 // Обработчик открытия попапа добавления карточки
 addButton.addEventListener("click", () => {
@@ -88,3 +87,18 @@ closeButtons.forEach((button) => {
   const popup = button.closest(".popup");
   button.addEventListener("click", () => closePopup(popup));
 });
+
+// Экспортируем функцию для открытия изображения
+export function openImagePopup(
+  link,
+  name,
+  imageElement,
+  captionElement,
+  imagePopup
+) {
+  imageElement.src = link;
+  imageElement.alt = name;
+  captionElement.textContent = name;
+
+  openPopup(imagePopup);
+}

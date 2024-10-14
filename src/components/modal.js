@@ -44,18 +44,3 @@ export function setPopupListeners() {
     });
   });
 }
-
-// Экспортируем функцию для открытия изображения
-export function openImagePopup(
-  link,
-  name,
-  imageElement,
-  captionElement,
-  imagePopup
-) {
-  imageElement.src = link;
-  imageElement.alt = name;
-  captionElement.textContent = name;
-
-  openPopup(imagePopup);
-}
