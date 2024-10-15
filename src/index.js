@@ -79,6 +79,14 @@ cardForm.addEventListener("submit", (evt) => {
   cardForm.reset();
 });
 
+export function openImagePopup(link, name) {
+  imageElement.src = link;
+  imageElement.alt = name;
+  captionElement.textContent = name;
+
+  openPopup(imagePopup);
+}
+
 // Включение валидации для всех форм
 const validationConfig = {
   formSelector: ".popup__form",
