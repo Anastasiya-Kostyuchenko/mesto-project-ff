@@ -1,4 +1,11 @@
-import { getUserInfo, getCards, addCard, deleteCard } from "../api";
+import {
+  getUserInfo,
+  getCards,
+  addCard,
+  deleteCard,
+  likeCard,
+  unlikeCard,
+} from "../api";
 
 // Создание карточки
 export function createCard(template, cardData, userId) {
@@ -19,8 +26,14 @@ export function createCard(template, cardData, userId) {
     likeButton.classList.add("card__like-button_is-active");
   }
 
-  likeCounter.textContent = cardData.likes.length;
+  // Обновление счетчика лайков
+  if (likeCounter) {
+    likeCounter.textContent = cardData.likes.length;
+  } else {
+    console.error("Элемент likeCounter не найден");
+  }
 
+  // Обработчик клика на кнопку лайка
   likeButton.addEventListener("click", () => {
     const isLiked = likeButton.classList.contains(
       "card__like-button_is-active"
@@ -37,8 +50,6 @@ export function createCard(template, cardData, userId) {
 
         if (likeCounter) {
           likeCounter.textContent = updatedCardData.likes.length;
-        } else {
-          console.error("Элемент likeCounter не найден");
         }
       })
       .catch((err) => {

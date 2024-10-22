@@ -91,7 +91,6 @@ Promise.all([getUserInfo(), getCards()])
   .then(([userData, cards]) => {
     profileName.textContent = userData.name;
     profileJob.textContent = userData.about;
-
     if (!Array.isArray(cards)) {
       console.error("cards не является массивом");
       return;
@@ -131,12 +130,17 @@ const avatarOpenButton = document.querySelector(".profile__image");
 const avatarCloseButton = avatarPopup.querySelector(".popup__close");
 const submitButton = avatarForm.querySelector(".popup__button");
 
+// Открытие попапа
 avatarOpenButton.addEventListener("click", () => {
   openPopup(avatarPopup);
 });
 
+// Закрытие попапа
 avatarCloseButton.addEventListener("click", () => {
-  closePopup(avatarPopup); // Закрытие попапа
+  closePopup(avatarPopup);
+  avatarForm.reset(); // Сбросить форму при закрытии
+  const errorElement = document.getElementById("avatar-error");
+  errorElement.textContent = ""; // Очистить сообщение об ошибке
 });
 
 // Обработчик отправки формы
@@ -145,6 +149,13 @@ avatarForm.addEventListener("submit", (event) => {
 
   const avatarInput = avatarForm.querySelector(".popup__input_type_avatar");
   const newAvatarUrl = avatarInput.value;
+
+  // Проверяем валидность URL перед отправкой
+  if (!isValidURL(newAvatarUrl)) {
+    const errorElement = document.getElementById("avatar-error");
+    errorElement.textContent = "Пожалуйста, введите корректный URL.";
+    return; // Прекращаем выполнение, если URL невалидный
+  }
 
   renderLoading(true, submitButton, "Сохранение...");
 
@@ -158,22 +169,27 @@ avatarForm.addEventListener("submit", (event) => {
   })
     .then(checkResponse)
     .then((data) => {
-      const newAvatarUrl = avatarInput.value;
+      // Обновляем аватар пользователя
       profileImage.style.backgroundImage = `url('${newAvatarUrl}')`;
-      closePopup(avatarForm.closest(".popup"));
+      closePopup(avatarPopup);
     })
     .catch((err) => {
       console.error(`Ошибка при смене аватара: ${err}`);
+      const errorElement = document.getElementById("avatar-error");
+      errorElement.textContent = "Не удалось сменить аватар. Попробуйте снова."; // Сообщение об ошибке
     })
     .finally(() => {
       renderLoading(false, submitButton, "Сохранить");
     });
 });
 
+// Функция для отображения состояния загрузки
 function renderLoading(isLoading, buttonElement, defaultText) {
   if (isLoading) {
     buttonElement.textContent = "Сохранение...";
+    buttonElement.disabled = true;
   } else {
     buttonElement.textContent = defaultText;
+    buttonElement.disabled = false;
   }
 }
