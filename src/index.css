@@ -11,20 +11,24 @@
 @import url("../blocks/popup/_is-animated/popup_is-animated.css");
 @import url("../blocks/popup/_is-opened/popup_is-opened.css");
 
-/* .form__input_type_error {
-  border-color: red;
-}
-
-.form__input-error_active {
-  color: red;
-  font-size: 12px;
-}
-
-.button_inactive {
-  background-color: grey;
-  cursor: not-allowed;
-} */
 .popup__button_disabled {
   opacity: 0.5;
   pointer-events: none;
+  background-color: #b3b3b3;
+  cursor: default;
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+}
+
+.card__like-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card__like-counter {
+  font-size: 13px;
+  font-weight: 400;
+  color: #000;
+  margin-top: 4px;
+  text-align: center;
 }

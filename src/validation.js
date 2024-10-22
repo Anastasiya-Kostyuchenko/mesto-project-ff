@@ -21,7 +21,7 @@ export function hideInputError(formElement, inputElement, config) {
 
 // Проверка поля на валидность
 export function checkInputValidity(formElement, inputElement, config) {
-  const regex = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/; // Допустимые символы для имени или названия
+  const regex = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/;
   const isNameOrTitleField =
     inputElement.name === "name" || inputElement.name === "place-name";
 
@@ -30,7 +30,7 @@ export function checkInputValidity(formElement, inputElement, config) {
       "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
     );
   } else {
-    inputElement.setCustomValidity(""); // Сброс ошибки
+    inputElement.setCustomValidity("");
   }
 
   if (!inputElement.validity.valid) {
@@ -102,68 +102,3 @@ export function clearValidation(formElement, config) {
 
   toggleButtonState(inputList, buttonElement, config);
 }
-
-// const regex = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/;
-
-// function validateInput(input) {
-//   const errorElement = document.querySelector(`.${input.name}-error`);
-
-//   if (!input.validity.valid) {
-//     if (input.name === "place-name") {
-//       if (input.validity.tooShort || input.validity.tooLong) {
-//         errorElement.textContent = `Должно быть от ${input.minLength} до ${input.maxLength} символов`;
-//       } else if (!regex.test(input.value)) {
-//         errorElement.textContent =
-//           "Поле может содержать только буквы, пробелы и дефисы";
-//       }
-//     } else if (input.name === "link" && input.validity.typeMismatch) {
-//       errorElement.textContent = "Введите правильный URL";
-//     } else {
-//       errorElement.textContent = input.validationMessage;
-//     }
-//     input.classList.add("form__input_type_error");
-//     errorElement.classList.add("form__input-error_active");
-//   } else {
-//     errorElement.textContent = "";
-//     input.classList.remove("form__input_type_error");
-//     errorElement.classList.remove("form__input-error_active");
-//   }
-// }
-
-// export function toggleButtonState(inputList, buttonElement, config) {
-//   const isFormValid = inputList.every(
-//     (inputElement) => inputElement.validity.valid
-//   );
-
-//   if (isFormValid) {
-//     buttonElement.disabled = false;
-//     buttonElement.classList.remove(config.inactiveButtonClass);
-//   } else {
-//     buttonElement.disabled = true;
-//     buttonElement.classList.add(config.inactiveButtonClass);
-//   }
-// }
-
-// function resetForm(form) {
-//   const inputList = Array.from(form.querySelectorAll(".popup__input"));
-//   inputList.forEach((input) => {
-//     const errorElement = document.querySelector(`.${input.name}-error`);
-//     errorElement.textContent = "";
-//     input.classList.remove("form__input_type_error");
-//     errorElement.classList.remove("form__input-error_active");
-//   });
-//   form.reset();
-//   toggleButtonState(form, form.querySelector(".popup__button"));
-// }
-
-// const saveButton = cardForm.querySelector(".popup__button");
-
-// cardForm.addEventListener("input", (evt) => {
-//   validateInput(evt.target);
-//   toggleButtonState(cardForm, saveButton);
-// });
-
-// addButton.addEventListener("click", () => {
-//   resetForm(cardForm);
-//   openPopup(addCardPopup);
-// });

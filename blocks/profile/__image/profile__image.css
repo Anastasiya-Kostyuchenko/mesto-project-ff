@@ -20,3 +20,16 @@
     margin-right: 0;
   }
 }
+
+.profile__image:hover::after {
+  content: "";
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  background-image: url(/src/images/Vector.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 22%;
+  background-color: rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+}
