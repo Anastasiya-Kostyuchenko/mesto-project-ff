@@ -5,8 +5,8 @@ export function showInputError(
   errorMessage,
   config
 ) {
-  const errorElement = formElement.querySelector(`.${inputElement.name}-error`);
   inputElement.classList.add(config.inputErrorClass);
+  const errorElement = formElement.querySelector(`.${inputElement.name}-error`);
   errorElement.textContent = errorMessage;
   errorElement.classList.add(config.errorClass);
 }

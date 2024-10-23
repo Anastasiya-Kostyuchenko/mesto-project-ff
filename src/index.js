@@ -5,7 +5,15 @@ import {
   closePopup,
   setPopupListeners,
 } from "./components/modal.js";
-import { enableValidation, clearValidation } from "./validation.js";
+import {
+  enableValidation,
+  clearValidation,
+  showInputError,
+  hideInputError,
+  checkInputValidity,
+  toggleButtonState,
+  setEventListeners,
+} from "./validation.js";
 import {
   getUserInfo,
   getCards,
@@ -36,7 +44,6 @@ const imagePopup = document.querySelector(".popup_type_image");
 const imageElement = imagePopup.querySelector(".popup__image");
 const captionElement = imagePopup.querySelector(".popup__caption");
 
-const avatarForm = document.querySelector('form[name="avatar-form"]');
 const profileImage = document.querySelector(".profile__image");
 
 setPopupListeners();
@@ -128,33 +135,35 @@ cardForm.addEventListener("submit", (evt) => {
 const avatarPopup = document.querySelector(".popup_type_avatar");
 const avatarOpenButton = document.querySelector(".profile__image");
 const avatarCloseButton = avatarPopup.querySelector(".popup__close");
-const submitButton = avatarForm.querySelector(".popup__button");
+const avatarForm = document.querySelector('form[name="avatar-form"]'); // Переместите сюда
+const submitButton = avatarForm.querySelector(".popup__button"); // Переместите сюда
 
 // Открытие попапа
 avatarOpenButton.addEventListener("click", () => {
   openPopup(avatarPopup);
+  submitButton.disabled = true; // Блокируем кнопку при открытии попапа
 });
 
 // Закрытие попапа
 avatarCloseButton.addEventListener("click", () => {
   closePopup(avatarPopup);
   avatarForm.reset(); // Сбросить форму при закрытии
-  const errorElement = document.getElementById("avatar-error");
+  const errorElement = document.querySelector(".avatar-error");
   errorElement.textContent = ""; // Очистить сообщение об ошибке
 });
 
-// Обработчик отправки формы
+// Проверка валидности URL перед отправкой
 avatarForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
   const avatarInput = avatarForm.querySelector(".popup__input_type_avatar");
   const newAvatarUrl = avatarInput.value;
 
-  // Проверяем валидность URL перед отправкой
   if (!isValidURL(newAvatarUrl)) {
-    const errorElement = document.getElementById("avatar-error");
+    const errorElement = document.querySelector(".avatar-error");
+
     errorElement.textContent = "Пожалуйста, введите корректный URL.";
-    return; // Прекращаем выполнение, если URL невалидный
+    return;
   }
 
   renderLoading(true, submitButton, "Сохранение...");
@@ -175,8 +184,8 @@ avatarForm.addEventListener("submit", (event) => {
     })
     .catch((err) => {
       console.error(`Ошибка при смене аватара: ${err}`);
-      const errorElement = document.getElementById("avatar-error");
-      errorElement.textContent = "Не удалось сменить аватар. Попробуйте снова."; // Сообщение об ошибке
+      const errorElement = document.querySelector(".avatar-error");
+      errorElement.textContent = "Не удалось сменить аватар. Попробуйте снова.";
     })
     .finally(() => {
       renderLoading(false, submitButton, "Сохранить");
@@ -192,4 +201,11 @@ function renderLoading(isLoading, buttonElement, defaultText) {
     buttonElement.textContent = defaultText;
     buttonElement.disabled = false;
   }
+}
+
+// Функция для проверки валидности URL
+function isValidURL(url) {
+  const urlPattern =
+    /^(https?:\/\/)?([\w\-]+)\.([a-z]{2,6}\.?)(\/[\w\-.~:?#[\]@!$&'()*+,;=]*)*\/?$/i;
+  return urlPattern.test(url);
 }

@@ -105,18 +105,13 @@
         <button type="button" class="card__delete-button"></button>
         <div class="card__description">
           <h2 class="card__title"></h2>
-          <button type="button" class="card__like-button"></button>
+          <div class="card__like-container">
+            <button type="button" class="card__like-button"></button>
+            <span class="card__like-counter">0</span>
+          </div>
         </div>
       </li>
     </template>
-    <div class="card__info">
-      <h2 class="card__title">Название</h2>
-      <div class="card__like-container">
-        <button type="button" class="card__like-button"></button>
-        <span class="card__like-counter">0</span>
-      </div>
-    </div>
-
     <div class="popup popup_type_avatar">
       <div class="popup__content">
         <button type="button" class="popup__close"></button>
@@ -127,7 +122,7 @@
             class="popup__input popup__input_type_avatar"
             placeholder="Ссылка на новый аватар"
             required />
-          <span class="popup__error"></span>
+          <span class="popup__error avatar-error"></span>
           <button type="submit" class="popup__button">Сохранить</button>
         </form>
       </div>
