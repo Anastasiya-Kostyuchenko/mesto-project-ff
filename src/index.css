@@ -11,6 +11,22 @@
 @import url("../blocks/popup/_is-animated/popup_is-animated.css");
 @import url("../blocks/popup/_is-opened/popup_is-opened.css");
 
+.popup__error_visible {
+  color: red;
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14.52px;
+  text-align: left;
+  margin-top: 4px;
+}
+
+.popup__input_type_error {
+  border: none;
+  border-bottom: 1px solid red;
+  outline: none;
+}
+
 .popup__button_disabled {
   opacity: 0.5;
   pointer-events: none;

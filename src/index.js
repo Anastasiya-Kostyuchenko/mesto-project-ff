@@ -43,6 +43,14 @@ const cardForm = document.querySelector('form[name="new-place"]');
 const imagePopup = document.querySelector(".popup_type_image");
 const imageElement = imagePopup.querySelector(".popup__image");
 const captionElement = imagePopup.querySelector(".popup__caption");
+const config = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+};
 
 const profileImage = document.querySelector(".profile__image");
 
@@ -135,22 +143,30 @@ cardForm.addEventListener("submit", (evt) => {
 const avatarPopup = document.querySelector(".popup_type_avatar");
 const avatarOpenButton = document.querySelector(".profile__image");
 const avatarCloseButton = avatarPopup.querySelector(".popup__close");
-const avatarForm = document.querySelector('form[name="avatar-form"]'); // Переместите сюда
-const submitButton = avatarForm.querySelector(".popup__button"); // Переместите сюда
+const avatarForm = document.querySelector('form[name="avatar-form"]');
+const submitButton = avatarForm.querySelector(".popup__button");
 
 // Открытие попапа
 avatarOpenButton.addEventListener("click", () => {
   openPopup(avatarPopup);
-  submitButton.disabled = true; // Блокируем кнопку при открытии попапа
+  submitButton.disabled = true;
+  submitButton.classList.add(config.inactiveButtonClass);
 });
 
 // Закрытие попапа
 avatarCloseButton.addEventListener("click", () => {
   closePopup(avatarPopup);
-  avatarForm.reset(); // Сбросить форму при закрытии
-  const errorElement = document.querySelector(".avatar-error");
-  errorElement.textContent = ""; // Очистить сообщение об ошибке
+  avatarForm.reset();
+  submitButton.disabled = true;
+  submitButton.classList.add(config.inactiveButtonClass);
 });
+
+// Функция для проверки валидности URL
+function isValidURL(url) {
+  const urlPattern =
+    /^(http:\/\/|https:\/\/)([\w\-]+\.)+[\w]{2,}(\/[\w\-.~:?#[\]@!$&'()*+,;=]*)*\/?$/i;
+  return urlPattern.test(url);
+}
 
 // Проверка валидности URL перед отправкой
 avatarForm.addEventListener("submit", (event) => {
@@ -178,7 +194,6 @@ avatarForm.addEventListener("submit", (event) => {
   })
     .then(checkResponse)
     .then((data) => {
-      // Обновляем аватар пользователя
       profileImage.style.backgroundImage = `url('${newAvatarUrl}')`;
       closePopup(avatarPopup);
     })
@@ -203,9 +218,22 @@ function renderLoading(isLoading, buttonElement, defaultText) {
   }
 }
 
-// Функция для проверки валидности URL
-function isValidURL(url) {
-  const urlPattern =
-    /^(https?:\/\/)?([\w\-]+)\.([a-z]{2,6}\.?)(\/[\w\-.~:?#[\]@!$&'()*+,;=]*)*\/?$/i;
-  return urlPattern.test(url);
+// Получение данных пользователя
+function getUserProfile() {
+  fetch(`https://nomoreparties.co/v1/${cohortId}/users/me`, {
+    headers: {
+      authorization: apiToken,
+    },
+  })
+    .then(checkResponse)
+    .then((data) => {
+      profileImage.style.backgroundImage = `url('${data.avatar}')`;
+    })
+    .catch((err) => {
+      console.error(`Ошибка при получении данных профиля: ${err}`);
+    });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  getUserProfile();
+});

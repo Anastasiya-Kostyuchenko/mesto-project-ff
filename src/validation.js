@@ -5,8 +5,12 @@ export function showInputError(
   errorMessage,
   config
 ) {
-  inputElement.classList.add(config.inputErrorClass);
   const errorElement = formElement.querySelector(`.${inputElement.name}-error`);
+  if (!errorElement) {
+    console.error(`Элемент ошибки для ${inputElement.name} не найден`);
+    return;
+  }
+  inputElement.classList.add(config.inputErrorClass);
   errorElement.textContent = errorMessage;
   errorElement.classList.add(config.errorClass);
 }
@@ -17,6 +21,21 @@ export function hideInputError(formElement, inputElement, config) {
   inputElement.classList.remove(config.inputErrorClass);
   errorElement.classList.remove(config.errorClass);
   errorElement.textContent = "";
+}
+
+// Функция для управления текстом и состоянием кнопки во время загрузки
+export function renderLoading(
+  isLoading,
+  buttonElement,
+  defaultText = "Сохранить"
+) {
+  if (isLoading) {
+    buttonElement.textContent = "Сохранение...";
+    buttonElement.disabled = true;
+  } else {
+    buttonElement.textContent = defaultText;
+    buttonElement.disabled = false;
+  }
 }
 
 // Проверка поля на валидность
@@ -82,6 +101,16 @@ export function enableValidation(config) {
   formList.forEach((formElement) => {
     formElement.addEventListener("submit", (evt) => {
       evt.preventDefault();
+
+      const buttonElement = formElement.querySelector(
+        config.submitButtonSelector
+      );
+      renderLoading(true, buttonElement);
+
+      // Имитация запроса, например, через fetch
+      setTimeout(() => {
+        renderLoading(false, buttonElement);
+      }, 2000); // Замените на реальный запрос
     });
 
     setEventListeners(formElement, config);
