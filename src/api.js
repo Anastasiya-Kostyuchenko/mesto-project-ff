@@ -92,3 +92,26 @@ export function unlikeCard(cardId) {
     }
   ).then(checkResponse);
 }
+
+// Получение данных пользователя
+
+export function getUserProfile(cohortId, apiToken) {
+  return fetch(`https://nomoreparties.co/v1/${cohortId}/users/me`, {
+    method: "GET",
+    headers: {
+      authorization: apiToken,
+      "Content-Type": "application/json",
+    },
+  }).then(checkResponse);
+}
+
+export function updateAvatar(cohortId, apiToken, newAvatarUrl) {
+  return fetch(`https://nomoreparties.co/v1/${cohortId}/users/me/avatar`, {
+    method: "PATCH",
+    headers: {
+      authorization: apiToken,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ avatar: newAvatarUrl }),
+  }).then(checkResponse);
+}

@@ -1,14 +1,10 @@
-import {
-  getUserInfo,
-  getCards,
-  addCard,
-  deleteCard,
-  likeCard,
-  unlikeCard,
-} from "../api";
-
-// Создание карточки
-export function createCard(template, cardData, userId) {
+// Создание карточки с колбэками для событий
+export function createCard(
+  template,
+  cardData,
+  userId,
+  { onLike, onUnlike, onDelete, onImageClick }
+) {
   const cardElement = template.content
     .querySelector(".places__item")
     .cloneNode(true);
@@ -38,16 +34,11 @@ export function createCard(template, cardData, userId) {
     const isLiked = likeButton.classList.contains(
       "card__like-button_is-active"
     );
-    const action = isLiked ? unlikeCard : likeCard;
+    const action = isLiked ? onUnlike : onLike;
 
     action(cardData._id)
       .then((updatedCardData) => {
-        if (isLiked) {
-          likeButton.classList.remove("card__like-button_is-active");
-        } else {
-          likeButton.classList.add("card__like-button_is-active");
-        }
-
+        likeButton.classList.toggle("card__like-button_is-active", !isLiked);
         if (likeCounter) {
           likeCounter.textContent = updatedCardData.likes.length;
         }
@@ -64,7 +55,7 @@ export function createCard(template, cardData, userId) {
 
   if (cardData.owner._id === userId) {
     deleteButton.addEventListener("click", () => {
-      deleteCard(cardData._id)
+      onDelete(cardData._id)
         .then(() => {
           cardElement.remove();
         })
@@ -75,6 +66,11 @@ export function createCard(template, cardData, userId) {
   } else {
     deleteButton.remove();
   }
+
+  // Обработчик клика на изображение для открытия попапа
+  cardImage.addEventListener("click", () => {
+    onImageClick(cardData);
+  });
 
   return cardElement;
 }

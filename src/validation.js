@@ -23,35 +23,24 @@ export function hideInputError(formElement, inputElement, config) {
   errorElement.textContent = "";
 }
 
-// Функция для управления текстом и состоянием кнопки во время загрузки
-export function renderLoading(
-  isLoading,
-  buttonElement,
-  defaultText = "Сохранить"
-) {
-  if (isLoading) {
-    buttonElement.textContent = "Сохранение...";
-    buttonElement.disabled = true;
-  } else {
-    buttonElement.textContent = defaultText;
-    buttonElement.disabled = false;
-  }
-}
-
 // Проверка поля на валидность
 export function checkInputValidity(formElement, inputElement, config) {
   const regex = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/;
   const isNameOrTitleField =
-    inputElement.name === "name" || inputElement.name === "place-name";
+    inputElement.name === "name" ||
+    inputElement.name === "place-name" ||
+    inputElement.name === "description";
 
   if (isNameOrTitleField && !regex.test(inputElement.value)) {
-    inputElement.setCustomValidity(
-      "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
-    );
+    const errorMessage =
+      inputElement.dataset.errorMessage ||
+      "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы";
+    inputElement.setCustomValidity(errorMessage);
   } else {
     inputElement.setCustomValidity("");
   }
 
+  // Отображение ошибки или её скрытие
   if (!inputElement.validity.valid) {
     showInputError(
       formElement,
@@ -80,7 +69,7 @@ export function toggleButtonState(inputList, buttonElement, config) {
 }
 
 // Навешиваем обработчики событий на форму
-export function setEventListeners(formElement, config) {
+export function setEventListeners(formElement, config, renderLoading) {
   const inputList = Array.from(
     formElement.querySelectorAll(config.inputSelector)
   );
@@ -95,7 +84,7 @@ export function setEventListeners(formElement, config) {
 }
 
 // Функция включения валидации
-export function enableValidation(config) {
+export function enableValidation(config, renderLoading) {
   const formList = Array.from(document.querySelectorAll(config.formSelector));
 
   formList.forEach((formElement) => {
@@ -106,19 +95,14 @@ export function enableValidation(config) {
         config.submitButtonSelector
       );
       renderLoading(true, buttonElement);
-
-      // Имитация запроса, например, через fetch
-      setTimeout(() => {
-        renderLoading(false, buttonElement);
-      }, 2000); // Замените на реальный запрос
     });
 
-    setEventListeners(formElement, config);
+    setEventListeners(formElement, config, renderLoading);
   });
 }
 
 // Очистка ошибок валидации и сброс состояния кнопки
-export function clearValidation(formElement, config) {
+export function clearValidation(formElement, config, renderLoading) {
   const inputList = Array.from(
     formElement.querySelectorAll(config.inputSelector)
   );

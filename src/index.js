@@ -1,5 +1,5 @@
 import "./index.css";
-import { createCard, deleteCard } from "./components/card.js";
+import { createCard } from "./components/card.js";
 import {
   openPopup,
   closePopup,
@@ -22,6 +22,11 @@ import {
   checkResponse,
   cohortId,
   apiToken,
+  deleteCard,
+  likeCard,
+  unlikeCard,
+  getUserProfile,
+  updateAvatar,
 } from "./api.js";
 
 // Переменные
@@ -43,6 +48,9 @@ const cardForm = document.querySelector('form[name="new-place"]');
 const imagePopup = document.querySelector(".popup_type_image");
 const imageElement = imagePopup.querySelector(".popup__image");
 const captionElement = imagePopup.querySelector(".popup__caption");
+
+const profileImage = document.querySelector(".profile__image");
+
 const config = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
@@ -52,22 +60,20 @@ const config = {
   errorClass: "popup__error_visible",
 };
 
-const profileImage = document.querySelector(".profile__image");
-
 setPopupListeners();
 
 // Обработчик открытия попапа редактирования профиля
 editButton.addEventListener("click", () => {
   nameInput.value = profileName.textContent;
   jobInput.value = profileJob.textContent;
-  clearValidation(editProfileForm, validationConfig);
+  clearValidation(editProfileForm, config);
   openPopup(editPopup);
 });
 
 // Обработчик сохранения данных профиля
 editProfileForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
-  renderLoading(true, submitButton, "Сохранение...");
+  renderLoading(true, avatarSubmitButton, "Сохранение...");
   updateProfile(nameInput.value, jobInput.value)
     .then((updatedUserData) => {
       profileName.textContent = updatedUserData.name;
@@ -78,56 +84,51 @@ editProfileForm.addEventListener("submit", (evt) => {
       console.error(`Ошибка обновления профиля: ${err}`);
     })
     .finally(() => {
-      renderLoading(false, submitButton, "Сохранить");
+      renderLoading(false, avatarSubmitButton, "Сохранить");
     });
 });
 
 // Обработчик открытия попапа добавления карточки
 addButton.addEventListener("click", () => {
-  clearValidation(addCardForm, validationConfig);
+  clearValidation(addCardForm, config);
   openPopup(addCardPopup);
 });
 
-// Включение валидации для всех форм
-const validationConfig = {
-  formSelector: ".popup__form",
-  inputSelector: ".popup__input",
-  submitButtonSelector: ".popup__button",
-  inactiveButtonClass: "popup__button_disabled",
-  inputErrorClass: "popup__input_type_error",
-  errorClass: "popup__error_visible",
-};
-
-enableValidation(validationConfig);
-
 let userId;
 
-Promise.all([getUserInfo(), getCards()])
-  .then(([userData, cards]) => {
-    profileName.textContent = userData.name;
-    profileJob.textContent = userData.about;
-    if (!Array.isArray(cards)) {
-      console.error("cards не является массивом");
-      return;
-    }
+Promise.all([getUserInfo(), getCards()]).then(([userData, cards]) => {
+  profileName.textContent = userData.name;
+  profileJob.textContent = userData.about;
+  profileImage.style.backgroundImage = `url('${userData.avatar}')`;
+  if (!Array.isArray(cards)) {
+    console.error("cards не является массивом");
+    return;
+  }
 
-    // Отображение карточек на странице
-    cards.forEach((card) => {
-      const cardElement = createCard(cardTemplate, card, userData._id);
-      placesList.append(cardElement);
+  // Отображение карточек на странице
+  cards.forEach((card) => {
+    const cardElement = createCard(cardTemplate, card, userData._id, {
+      onLike: likeCard,
+      onUnlike: unlikeCard,
+      onDelete: deleteCard,
     });
-  })
-  .catch((err) => {
-    console.error(`Ошибка получения данных с сервера: ${err}`);
+    placesList.append(cardElement);
   });
+  userId = userData._id;
+});
 
 // Обработчик добавления новой карточки
 cardForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
-  renderLoading(true, submitButton, "Сохранение...");
+  renderLoading(true, avatarSubmitButton, "Сохранение...");
+
   addCard(cardNameInput.value, cardUrlInput.value)
     .then((newCardData) => {
-      const cardElement = createCard(cardTemplate, newCardData, userId);
+      const cardElement = createCard(cardTemplate, newCardData, userId, {
+        onLike: likeCard,
+        onUnlike: unlikeCard,
+        onDelete: deleteCard,
+      });
       placesList.prepend(cardElement);
       closePopup(addCardPopup);
       cardForm.reset();
@@ -136,7 +137,7 @@ cardForm.addEventListener("submit", (evt) => {
       console.error(`Ошибка добавления карточки: ${err}`);
     })
     .finally(() => {
-      renderLoading(false, submitButton, "Сохранить");
+      renderLoading(false, avatarSubmitButton, "Сохранить");
     });
 });
 
@@ -144,21 +145,21 @@ const avatarPopup = document.querySelector(".popup_type_avatar");
 const avatarOpenButton = document.querySelector(".profile__image");
 const avatarCloseButton = avatarPopup.querySelector(".popup__close");
 const avatarForm = document.querySelector('form[name="avatar-form"]');
-const submitButton = avatarForm.querySelector(".popup__button");
+const avatarSubmitButton = avatarForm.querySelector(".popup__button");
 
 // Открытие попапа
 avatarOpenButton.addEventListener("click", () => {
   openPopup(avatarPopup);
-  submitButton.disabled = true;
-  submitButton.classList.add(config.inactiveButtonClass);
+  avatarSubmitButton.disabled = true;
+  avatarSubmitButton.classList.add(config.inactiveButtonClass);
 });
 
 // Закрытие попапа
 avatarCloseButton.addEventListener("click", () => {
   closePopup(avatarPopup);
   avatarForm.reset();
-  submitButton.disabled = true;
-  submitButton.classList.add(config.inactiveButtonClass);
+  avatarSubmitButton.disabled = true;
+  avatarSubmitButton.classList.add(config.inactiveButtonClass);
 });
 
 // Функция для проверки валидности URL
@@ -168,6 +169,19 @@ function isValidURL(url) {
   return urlPattern.test(url);
 }
 
+// Функция для отображения состояния загрузки
+function renderLoading(isLoading, buttonElement, defaultText = "Сохранить") {
+  if (isLoading) {
+    buttonElement.textContent = "Сохранение...";
+    buttonElement.disabled = true;
+  } else {
+    buttonElement.textContent = defaultText;
+    buttonElement.disabled = false;
+  }
+}
+
+enableValidation(config, renderLoading);
+
 // Проверка валидности URL перед отправкой
 avatarForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -175,24 +189,9 @@ avatarForm.addEventListener("submit", (event) => {
   const avatarInput = avatarForm.querySelector(".popup__input_type_avatar");
   const newAvatarUrl = avatarInput.value;
 
-  if (!isValidURL(newAvatarUrl)) {
-    const errorElement = document.querySelector(".avatar-error");
+  renderLoading(true, avatarSubmitButton, "Сохранение...");
 
-    errorElement.textContent = "Пожалуйста, введите корректный URL.";
-    return;
-  }
-
-  renderLoading(true, submitButton, "Сохранение...");
-
-  fetch(`https://nomoreparties.co/v1/${cohortId}/users/me/avatar`, {
-    method: "PATCH",
-    headers: {
-      authorization: apiToken,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ avatar: newAvatarUrl }),
-  })
-    .then(checkResponse)
+  updateAvatar(cohortId, apiToken, newAvatarUrl)
     .then((data) => {
       profileImage.style.backgroundImage = `url('${newAvatarUrl}')`;
       closePopup(avatarPopup);
@@ -203,37 +202,6 @@ avatarForm.addEventListener("submit", (event) => {
       errorElement.textContent = "Не удалось сменить аватар. Попробуйте снова.";
     })
     .finally(() => {
-      renderLoading(false, submitButton, "Сохранить");
+      renderLoading(false, avatarSubmitButton, "Сохранить");
     });
-});
-
-// Функция для отображения состояния загрузки
-function renderLoading(isLoading, buttonElement, defaultText) {
-  if (isLoading) {
-    buttonElement.textContent = "Сохранение...";
-    buttonElement.disabled = true;
-  } else {
-    buttonElement.textContent = defaultText;
-    buttonElement.disabled = false;
-  }
-}
-
-// Получение данных пользователя
-function getUserProfile() {
-  fetch(`https://nomoreparties.co/v1/${cohortId}/users/me`, {
-    headers: {
-      authorization: apiToken,
-    },
-  })
-    .then(checkResponse)
-    .then((data) => {
-      profileImage.style.backgroundImage = `url('${data.avatar}')`;
-    })
-    .catch((err) => {
-      console.error(`Ошибка при получении данных профиля: ${err}`);
-    });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  getUserProfile();
 });
