@@ -29,30 +29,47 @@ export function createCard(
     console.error("Элемент likeCounter не найден");
   }
 
-  // Обработчик клика на кнопку лайка
+  // Обработчик лайка
   likeButton.addEventListener("click", () => {
-    const isLiked = likeButton.classList.contains(
-      "card__like-button_is-active"
-    );
-    const action = isLiked ? onUnlike : onLike;
-
-    action(cardData._id)
-      .then((updatedCardData) => {
-        likeButton.classList.toggle("card__like-button_is-active", !isLiked);
-        if (likeCounter) {
-          likeCounter.textContent = updatedCardData.likes.length;
-        }
-      })
-      .catch((err) => {
-        console.error(`Ошибка при изменении лайка: ${err}`);
-      });
+    likeCallback(cardData._id, likeButton, likeCounter, onLike, onUnlike);
   });
 
-  if (!deleteButton) {
-    console.error("Кнопка удаления не найдена");
-    return cardElement;
-  }
+  // Обработчик удаления
+  deleteCallback(cardData, userId, cardElement, deleteButton, onDelete);
 
+  // Обработчик клика на изображение для открытия попапа
+  cardImage.addEventListener("click", () => {
+    onImageClick(cardData);
+  });
+
+  return cardElement;
+}
+
+// Колбэк для лайка
+const likeCallback = (cardId, likeButton, likeCounter, onLike, onUnlike) => {
+  const isLiked = likeButton.classList.contains("card__like-button_is-active");
+  const action = isLiked ? onUnlike : onLike;
+
+  action(cardId)
+    .then((updatedCardData) => {
+      likeButton.classList.toggle("card__like-button_is-active", !isLiked);
+      if (likeCounter) {
+        likeCounter.textContent = updatedCardData.likes.length;
+      }
+    })
+    .catch((err) => {
+      console.error(`Ошибка при изменении лайка: ${err}`);
+    });
+};
+
+// Колбэк для удаления карточки
+const deleteCallback = (
+  cardData,
+  userId,
+  cardElement,
+  deleteButton,
+  onDelete
+) => {
   if (cardData.owner._id === userId) {
     deleteButton.addEventListener("click", () => {
       onDelete(cardData._id)
@@ -66,11 +83,4 @@ export function createCard(
   } else {
     deleteButton.remove();
   }
-
-  // Обработчик клика на изображение для открытия попапа
-  cardImage.addEventListener("click", () => {
-    onImageClick(cardData);
-  });
-
-  return cardElement;
-}
+};

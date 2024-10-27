@@ -25,17 +25,8 @@ export function hideInputError(formElement, inputElement, config) {
 
 // Проверка поля на валидность
 export function checkInputValidity(formElement, inputElement, config) {
-  const regex = /^[a-zA-Zа-яА-ЯёЁ\s-]+$/;
-  const isNameOrTitleField =
-    inputElement.name === "name" ||
-    inputElement.name === "place-name" ||
-    inputElement.name === "description";
-
-  if (isNameOrTitleField && !regex.test(inputElement.value)) {
-    const errorMessage =
-      inputElement.dataset.errorMessage ||
-      "Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы";
-    inputElement.setCustomValidity(errorMessage);
+  if (inputElement.validity.patternMismatch) {
+    inputElement.setCustomValidity(inputElement.dataset.errorMessage);
   } else {
     inputElement.setCustomValidity("");
   }
